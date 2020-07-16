@@ -1,0 +1,59 @@
+---
+- name: Fail if you did not set any ssh-user
+  fail:
+    msg: "You did not set any 'ssh_users' \"{{ ssh_users }}\""
+  when: not ssh_users
+
+- name: make sure package 'sudo' is installed
+  package:
+    name: 'sudo'
+    state: present
+
+- name: make sure group 'wheeler' exists or create it
+  group:
+    name: 'wheeler'
+
+- name: create ssh users
+  include_tasks: ssh_user.yml
+  with_items:
+    - "{{ ssh_users }}"
+
+# this is a temporary one until we have our CI/CD # the follow up would be to remove the keys from root later ;)
+- name: Rollout all SSH keys for {{ ansible_user }}, remove invalid keys
+  authorized_key:
+    user: "{{ ansible_user }}"
+    key: >
+      {% for user in all_ssh_users %}
+      {{ lookup('file', ssh_keys_dir | default('files') + '/' + user + '.pub') ~ '\n'}}
+      {% endfor %}
+    state: present
+    exclusive: true
+
+- name: Add sudoers_nopasswd_for_wheeler to allow passwordless sudo for users in the sudo group
+  copy:
+    dest: '/etc/sudoers.d/nopasswd_for_wheeler'
+    src: 'sudoers_nopasswd_for_wheeler'
+    mode: '0440'
+    owner: 'root'
+
+- name: generate list of admin-users that can be deleted on host and delete them
+  block:
+    - name: get users of system 'wheeler' user-group that equals admin-users
+      getent:
+        database: group
+        key: wheeler
+        split: ':'
+
+    - name: generate list of admin-users
+      set_fact:
+        admin_users: "{{ getent_group.wheeler.2.split(',') }}"
+
+    - name: delete not listed users from system
+      user:
+        name: "{{ item }}"
+        state: absent
+        remove: true
+        groups: ''
+        group: "{{ item }}"
+      with_items: "{{ admin_users | difference(ssh_users) }}"
+  tags: delete_obsolete_users

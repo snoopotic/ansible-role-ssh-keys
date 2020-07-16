@@ -1,0 +1,7 @@
+---
+key_search_dirs:
+  paths:
+    - "{{ ssh_keys_dir | default('omit') }}"
+    - "files/"
+  files:
+    - "{{ item }}.pub"

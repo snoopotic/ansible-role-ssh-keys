@@ -1,0 +1,27 @@
+---
+
+- name: stat local "{{ item }}.pub File"
+  local_action: stat path="{{ lookup('first_found', key_search_dirs, errors='warn') }}"
+  register: item_pub
+
+- name: fail if user pubkeyfile does not exist
+  fail:
+    msg: user's Pubkey File "{{ item }}.pub not found"
+  when: not item_pub.stat.exists
+
+- name: Creating user group {{ item }}
+  group:
+    name: "{{ item }}"
+
+- name: Creating user {{ item }}
+  user:
+    name: "{{ item }}"
+    group: "{{ item }}"
+    groups:
+      - "wheeler"
+    shell: '/bin/bash'
+
+- name: Rollout SSH key for {{ item }}
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('file', item_pub.stat.path) }}"

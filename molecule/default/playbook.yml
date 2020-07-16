@@ -1,0 +1,13 @@
+---
+- name: Converge
+  hosts: all
+
+  vars:
+    ssh_users:
+      - 'testuser'
+    ssh_keys_dir: 'tests/myssh_keys'
+
+  tasks:
+    - name: "Include ssh-keys"
+      include_role:
+        name: "ansible-role-ssh"

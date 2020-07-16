@@ -1,0 +1,4 @@
+## This file is managed by ansible. Manual changes will be overwritten
+
+## Same thing without a password
+%wheeler        ALL=(ALL)       NOPASSWD: ALL
