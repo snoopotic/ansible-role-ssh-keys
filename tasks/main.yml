@@ -19,11 +19,11 @@
     - "{{ ssh_users }}"
 
 # this is a temporary one until we have our CI/CD # the follow up would be to remove the keys from root later ;)
-- name: Rollout all SSH keys for {{ ansible_user }}, remove invalid keys
+- name: Rollout all SSH keys for '{{ ansible_user }}', remove invalid keys
   authorized_key:
     user: "{{ ansible_user }}"
     key: >
-      {% for user in all_ssh_users %}
+      {% for user in ssh_users %}
       {{ lookup('file', ssh_keys_dir | default('files') + '/' + user + '.pub') ~ '\n'}}
       {% endfor %}
     state: present
