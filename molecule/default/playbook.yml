@@ -3,6 +3,7 @@
   hosts: all
 
   vars:
+    ansible_user: root
     ssh_users:
       - 'testuser'
     ssh_keys_dir: 'tests/myssh_keys'
