@@ -1,8 +1,10 @@
 ---
 
 - name: stat local "{{ item }}.pub File"
-  local_action: stat path="{{ lookup('first_found', key_search_dirs, errors='warn') }}"
+  stat:
+    path: "{{ lookup('first_found', key_search_dirs, errors='warn') }}"
   register: item_pub
+  delegate_to: localhost
 
 - name: fail if user pubkeyfile does not exist
   fail:
