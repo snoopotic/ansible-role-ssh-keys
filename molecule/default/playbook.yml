@@ -10,4 +10,4 @@
   tasks:
     - name: "Include ssh-keys"
       include_role:
-        name: "ansible-role-ssh"
+        name: "ansible-role-ssh-keys"
