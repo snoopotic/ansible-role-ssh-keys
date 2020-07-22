@@ -22,9 +22,9 @@
 - name: Rollout all SSH keys for '{{ ansible_user }}', remove invalid keys
   authorized_key:
     user: "{{ ansible_user }}"
-    key: >
+    key: |
       {% for user in ssh_users %}
-      {{ lookup('file', ssh_keys_dir | default('files') + '/' + user + '.pub') ~ '\n'}}
+      {{ lookup('file', ssh_keys_dir | default('files') + '/' + user + '.pub') }}
       {% endfor %}
     state: present
     exclusive: true
