@@ -5,6 +5,7 @@
     path: "{{ lookup('first_found', key_search_dirs, errors='warn') }}"
   register: item_pub
   delegate_to: localhost
+  become: false
 
 - name: fail if user pubkeyfile does not exist
   fail:
